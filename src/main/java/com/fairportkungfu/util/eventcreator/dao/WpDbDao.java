@@ -1,4 +1,4 @@
-package com.fairportkungfu.util.eventcreator;
+package com.fairportkungfu.util.eventcreator.dao;
 
 import java.util.List;
 

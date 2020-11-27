@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import com.fairportkungfu.util.eventcreator.dao.WpDbDao;
 import com.fairportkungfu.util.eventcreator.model.FkfClass;
 import com.fairportkungfu.util.eventcreator.model.WpEmEvents;
 import com.fairportkungfu.util.eventcreator.model.WpEmTickets;
