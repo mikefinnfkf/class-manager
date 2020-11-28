@@ -1,4 +1,4 @@
-package com.fairportkungfu.util.eventcreator.model;
+package com.fairportkungfu.util.classmanager.model;
 
 import java.sql.Timestamp;
 

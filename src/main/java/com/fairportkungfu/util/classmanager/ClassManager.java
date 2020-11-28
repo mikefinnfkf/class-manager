@@ -1,4 +1,4 @@
-package com.fairportkungfu.util.eventcreator;
+package com.fairportkungfu.util.classmanager;
 
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -6,17 +6,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Calendar.Builder;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
-import com.fairportkungfu.util.eventcreator.dao.WpDbDao;
-import com.fairportkungfu.util.eventcreator.model.FkfClass;
-import com.fairportkungfu.util.eventcreator.model.WpEmEvents;
-import com.fairportkungfu.util.eventcreator.model.WpEmTickets;
-import com.fairportkungfu.util.eventcreator.model.WpPostMeta;
-import com.fairportkungfu.util.eventcreator.model.WpPosts;
+import com.fairportkungfu.util.classmanager.dao.WpDbDao;
+import com.fairportkungfu.util.classmanager.model.FkfClass;
+import com.fairportkungfu.util.classmanager.model.WpEmEvents;
+import com.fairportkungfu.util.classmanager.model.WpEmTickets;
+import com.fairportkungfu.util.classmanager.model.WpPostMeta;
+import com.fairportkungfu.util.classmanager.model.WpPosts;
 
 public class ClassManager {
 
@@ -26,7 +27,9 @@ public class ClassManager {
 	private static DateFormat dfTime = new SimpleDateFormat("hh:mma");
 	private static DateFormat dfTimeCompressed = new SimpleDateFormat("hhmma");
 	private static DateFormat dfFullDateTimeMeta = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static DateFormat dfFullDateTimeLog = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss EEE");
 	private static DateFormat dfDateOnlyMeta = new SimpleDateFormat("yyyy-MM-dd");
+	private static DateFormat dfDateOnlyLog = new SimpleDateFormat("yyyy-MM-dd EEE");
 	private static DateFormat dfTimeOnlyMeta = new SimpleDateFormat("HH:mm:ss");
 	private static final String TIME_ZONE_ID = "EST5EDT";
 	private static final TimeZone TIME_ZONE = TimeZone.getTimeZone(TIME_ZONE_ID);
@@ -37,7 +40,14 @@ public class ClassManager {
 	private static final String PROG_KIDS = "Kids";
 	private static final String PROG_ADULTS = "Adults";
 	private static final String PROG_TEST = "TEST_DONOTUSE";
-	// Looks weird, but we don't want the classes to show up for registration until enabled. Just restore in the console.
+	private static final int DUR_TIGERS = 20;
+	private static final int DUR_KIDS = 35;
+	private static final int DUR_ADULTS_DEFAULT = 60;
+	private static final int DUR_ADULTS_SUNDAY = 45;
+	
+	
+	// Looks weird, but we don't want the classes to show up for registration until
+	// enabled. Just restore in the console.
 	private static final String POST_STATUS = "publish";
 
 	private Logger log = Logger.getLogger(getClass().getName());
@@ -46,46 +56,69 @@ public class ClassManager {
 
 	}
 
-	public void createClasses(int year, int month, int day) {
-		Calendar date = null;
+	public void createClasses(Date date) throws Exception {
+		Calendar dateCalClasses = null;
+		Calendar dateCalNow = null;
 		int dayOfWeek;
 
-		log.info("year="+year+";month="+month+";day="+day);
+		log.info("Date is "+dfDateOnlyLog.format(date));
 		
-		date = new Calendar.Builder().setDate(year, month-1, day).build();
-		log.info(date.toString());
+		// Convert to Date cal b/c it's easier to deal with the parts of date and time
+		dateCalClasses = new Calendar.Builder().setInstant(date).build();
+		dateCalNow = new Calendar.Builder().setInstant(System.currentTimeMillis()).build();
+		
+		log.info("Preflight check: given date and time is later than now");
+		log.info(" - Given time: "+dfFullDateTimeLog.format(dateCalClasses.getTime()));
+		log.info(" - Now       : "+dfFullDateTimeLog.format(dateCalNow.getTime()));
+
+		if (dateCalClasses.before(dateCalNow)) {
+			log.info("Failed preflight check for date. Aborting.");
+			throw new Exception("Date must be in future");
+		}
+		else
+			log.info(" - PASS");
+
+		log.info("Creating classes for: " + dfDateOnlyLog.format(dateCalClasses.getTime()) + ": START");
+
 		// What day of week is it?
-		dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
+		dayOfWeek = dateCalClasses.get(Calendar.DAY_OF_WEEK);
+		Builder builder = new Calendar.Builder();
+		builder.set(Calendar.MONTH, dateCalClasses.get(Calendar.MONTH));
+		builder.set(Calendar.DAY_OF_MONTH, dateCalClasses.get(Calendar.DAY_OF_MONTH));
+		builder.set(Calendar.YEAR, dateCalClasses.get(Calendar.YEAR));
 		
 		switch (dayOfWeek) {
 		case Calendar.SUNDAY:
-			createClass(year, month, day, 10, 0, 45, PROG_ADULTS);
+			createClass(builder.setTimeOfDay(10,  0 ,  0).build(), DUR_ADULTS_SUNDAY, PROG_ADULTS);
 			break;
 		case Calendar.TUESDAY:
-			createClass(year, month, day, 17, 0, 20, PROG_TIGERS);
-			createClass(year, month, day, 17, 35, 35, PROG_KIDS);
-			createClass(year, month, day, 18, 25, 35, PROG_KIDS);
-			createClass(year, month, day, 19, 15, 60, PROG_ADULTS);
+			createClass(builder.setTimeOfDay(17, 0, 0).build(), DUR_TIGERS, PROG_TIGERS);
+			createClass(builder.setTimeOfDay(17, 35, 0).build(), DUR_KIDS, PROG_KIDS);
+			createClass(builder.setTimeOfDay(18, 25, 0).build(), DUR_KIDS, PROG_KIDS);
+			createClass(builder.setTimeOfDay(19, 15, 0).build(), DUR_ADULTS_DEFAULT, PROG_ADULTS);
 			break;
 		case Calendar.THURSDAY:
-			createClass(year, month, day, 17, 0, 20, PROG_TIGERS);
-			createClass(year, month, day, 17, 35, 35, PROG_KIDS);
-			createClass(year, month, day, 18, 25, 35, PROG_KIDS);
-			createClass(year, month, day, 19, 15, 60, PROG_ADULTS);
+			createClass(builder.setTimeOfDay(17, 0, 0).build(), DUR_TIGERS, PROG_TIGERS);
+			createClass(builder.setTimeOfDay(17, 35, 0).build(), DUR_KIDS, PROG_KIDS);
+			createClass(builder.setTimeOfDay(18, 25, 0).build(), DUR_KIDS, PROG_KIDS);
+			createClass(builder.setTimeOfDay(19, 15, 0).build(), DUR_ADULTS_DEFAULT, PROG_ADULTS);
 			break;
 		case Calendar.SATURDAY:
-			createClass(year, month, day, 9, 0, 20, PROG_TIGERS);
-			createClass(year, month, day, 9, 35, 35, PROG_KIDS);
-			createClass(year, month, day, 10, 25, 35, PROG_KIDS);
-			createClass(year, month, day, 11, 15, 60, PROG_ADULTS);
+			createClass(builder.setTimeOfDay(9, 0, 0).build(), DUR_TIGERS, PROG_TIGERS);
+			createClass(builder.setTimeOfDay(9, 35, 0).build(), DUR_KIDS, PROG_KIDS);
+			createClass(builder.setTimeOfDay(10, 25, 0).build(), DUR_KIDS, PROG_KIDS);
+			createClass(builder.setTimeOfDay(11, 15, 0).build(), DUR_ADULTS_DEFAULT, PROG_ADULTS);
 			break;
 		default:
-			log.info("No classes to schedule on given day ("+dayOfWeek+")");
+			log.info("No classes to schedule on given day (" + dayOfWeek + ")");
 			break;
 		}
+
+		log.info("Creating classes for: " + dfDateOnlyLog.format(dateCalClasses.getTime()) + ": END");
+
 	}
 
-	private Long createClass(int year, int month, int day, int hour, int min, int durationMins, String program) {
+	private Long createClass(Calendar classTime, int durationMins, String program) {
 		FkfClass cls = null;
 		WpPosts post = null;
 		WpDbDao dao = null;
@@ -97,8 +130,9 @@ public class ClassManager {
 		Long eventId = 0L;
 
 		dao = new WpDbDao();
-		cls = renderClass(year, month, day, hour, min, durationMins, program);
-		log.info(cls.toString());
+		cls = renderClass(classTime, durationMins, program);
+	
+		log.info(" - Create class for: "+cls.toString());
 		post = map(cls);
 		post = dao.saveWpPost(post);
 		post.setGuid(post.getGuid() + "p=" + post.getId());
@@ -113,11 +147,11 @@ public class ClassManager {
 
 		tick = mapWpEmTicket(evt);
 		dao.saveWpEmTicket(tick);
-		
+
 		return postId;
 
 	}
-
+	
 	private WpPosts map(FkfClass cls) {
 		WpPosts post = null;
 		Timestamp currTime = null;
@@ -234,19 +268,19 @@ public class ClassManager {
 		metas.add(new WpPostMeta(evt.getPostId(), "_event_end_local",
 				dfDateOnlyMeta.format(new java.util.Date(evt.getEventEndDate().getTime())) + " "
 						+ dfTimeOnlyMeta.format(new java.util.Date(evt.getEventEndDate().getTime()))));
-		//metas.add(new WpPostMeta(evt.getPostId(), "_event_status", Integer.toString(evt.getEventStatus())));
+		// metas.add(new WpPostMeta(evt.getPostId(), "_event_status",
+		// Integer.toString(evt.getEventStatus())));
 		metas.add(new WpPostMeta(evt.getPostId(), "_event_language", evt.getEventLanguage()));
 		// metas.add(new WpPostMeta(post.getId(),"_wp_old_slug",""));
 
 		return metas;
 	}
-	
-	private WpEmTickets mapWpEmTicket(WpEmEvents evt)
-	{
+
+	private WpEmTickets mapWpEmTicket(WpEmEvents evt) {
 		WpEmTickets tick = null;
-		
+
 		tick = new WpEmTickets(evt.getEventId(), "Student Reservation", 0.00d, ALLOWED_SPACES, 1);
-		
+
 		return tick;
 	}
 
@@ -316,14 +350,11 @@ public class ClassManager {
 		return utcTime;
 	}
 
-	public FkfClass renderClass(int year, int month, int day, int hour, int min, int durationMins, String program) {
-		Calendar startCal = null;
+	private FkfClass renderClass(Calendar startCal, int durationMins, String program) {
 
 		Timestamp start = null;
 		Timestamp end = null;
 
-		startCal = new Calendar.Builder().setCalendarType("iso8601").setDate(year, month - 1, day)
-				.setTimeOfDay(hour, min, 0).build();
 		startCal.setTimeZone(TimeZone.getTimeZone("GMT"));
 		start = new Timestamp(startCal.getTime().getTime());
 		end = new Timestamp(start.getTime() + (durationMins * 60 * 1000));

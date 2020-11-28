@@ -1,4 +1,4 @@
-package com.fairportkungfu.util.eventcreator.dao;
+package com.fairportkungfu.util.classmanager.dao;
 
 import java.util.List;
 
@@ -6,10 +6,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import com.fairportkungfu.util.eventcreator.model.WpEmEvents;
-import com.fairportkungfu.util.eventcreator.model.WpEmTickets;
-import com.fairportkungfu.util.eventcreator.model.WpPostMeta;
-import com.fairportkungfu.util.eventcreator.model.WpPosts;
+import com.fairportkungfu.util.classmanager.model.WpEmEvents;
+import com.fairportkungfu.util.classmanager.model.WpEmTickets;
+import com.fairportkungfu.util.classmanager.model.WpPostMeta;
+import com.fairportkungfu.util.classmanager.model.WpPosts;
 
 public class WpDbDao {
 
