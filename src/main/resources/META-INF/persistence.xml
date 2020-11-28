@@ -10,7 +10,7 @@
 			<property name="javax.persistence.jdbc.url" value="" />
 			<property name="javax.persistence.jdbc.user"value="" />
 			<property name="javax.persistence.jdbc.password" value="" />
-			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
 		</properties>
 	</persistence-unit>
 	
@@ -23,7 +23,7 @@
 			<property name="javax.persistence.jdbc.password" value="" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			<property name="javax.persistence.jdbc.driver"
-				value="com.mysql.jdbc.Driver" />
+				value="com.mysql.cj.jdbc.Driver" />
 		</properties>
 	</persistence-unit>
 </persistence>
