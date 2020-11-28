@@ -2,6 +2,12 @@ package com.fairportkungfu.util.classmanager.model;
 
 import java.sql.Timestamp;
 
+/**
+ * Simple wrapper to hold basic properties of a class. Not persisted.
+ * 
+ * @author Mike Finn <mike@fairportkungfu.com>
+ *
+ */
 public class FkfClass {
 
 	private String program;
@@ -9,7 +15,6 @@ public class FkfClass {
 	private Timestamp endTime;
 
 	public FkfClass() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public FkfClass(String program, Timestamp startTime, Timestamp endTime) {

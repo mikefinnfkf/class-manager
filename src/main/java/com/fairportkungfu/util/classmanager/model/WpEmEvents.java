@@ -11,6 +11,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * JPA/Hibernate entity class
+ * 
+ * For table wp_em_events. Holds event detail for WP Event Manager events.
+ * 
+ * @author Mike Finn <mike@fairportkungfu.com>
+ *
+ */
 @Entity
 @Table(name = "wp_em_events")
 public class WpEmEvents {
@@ -98,7 +106,6 @@ public class WpEmEvents {
 	private int eventTranslation;
 
 	public WpEmEvents() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public Long getEventId() {

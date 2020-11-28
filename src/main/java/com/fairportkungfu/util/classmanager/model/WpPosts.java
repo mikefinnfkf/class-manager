@@ -9,13 +9,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * JPA/Hibernate entity class
+ * 
+ * For table wp_em_events. Holds WP Post info.
+ * 
+ * @author Mike Finn <mike@fairportkungfu.com>
+ *
+ */
 @Entity
 @Table(name = "wp_posts")
 public class WpPosts {
 
-	public WpPosts() {
-		// TODO Auto-generated constructor stub
-	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -87,6 +92,10 @@ public class WpPosts {
 	@Column(name = "comment_count")
 	private Long commentCount;
 
+	public WpPosts() {
+	}
+
+	
 	public Long getId() {
 		return id;
 	}

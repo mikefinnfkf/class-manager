@@ -9,6 +9,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * JPA/Hibernate entity class
+ * 
+ * For table wp_em_tickets. Holds ticket/booking counts for WP Event Manager events.
+ * 
+ * @author Mike Finn <mike@fairportkungfu.com>
+ *
+ */
 @Entity
 @Table(name = "wp_em_tickets")
 public class WpEmTickets {
@@ -67,7 +75,6 @@ public class WpEmTickets {
 	private String ticketMeta;
 
 	public WpEmTickets() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public WpEmTickets(Long eventId, String ticketName, Double ticketPrice, int ticketSpaces, int ticketOrder) {

@@ -7,6 +7,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * JPA/Hibernate entity class
+ * 
+ * For table wp_postmeta. WP table to hold metadata for posts.
+ * 
+ * @author Mike Finn <mike@fairportkungfu.com>
+ *
+ */
 @Entity
 @Table(name = "wp_postmeta")
 public class WpPostMeta {
@@ -26,11 +34,8 @@ public class WpPostMeta {
 	private String meta_value;
 
 	public WpPostMeta() {
-		// TODO Auto-generated constructor stub
 	}
 	
-	
-
 	public WpPostMeta(Long postId, String meta_key, String meta_value) {
 		super();
 		this.postId = postId;
