@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -21,6 +22,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "wp_em_events")
+@NamedQuery(name = "WpEmEvents.findByPostId", query = "select p from WpEmEvents p where p.postId = :postId")
+@NamedQuery(name = "WpEmEvents.queryByDate", query = "select p from WpEmEvents p where p.eventStartDate >= :startDate and p.eventStartDate <= :endDate")
 public class WpEmEvents {
 
 	@Id

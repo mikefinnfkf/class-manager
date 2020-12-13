@@ -7,18 +7,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
  * JPA/Hibernate entity class
  * 
- * For table wp_em_tickets. Holds ticket/booking counts for WP Event Manager events.
+ * For table wp_em_tickets. Holds ticket/booking counts for WP Event Manager
+ * events.
  * 
  * @author Mike Finn <mike@fairportkungfu.com>
  *
  */
 @Entity
 @Table(name = "wp_em_tickets")
+@NamedQuery(name = "WpEmTickets.findByEventId", query = "select p from WpEmTickets p where p.eventId = :eventId")
 public class WpEmTickets {
 
 	@Id
@@ -61,16 +64,16 @@ public class WpEmTickets {
 
 	@Column(name = "ticket_guests")
 	private int ticketGuests;
-	
+
 	@Column(name = "ticket_required")
 	private int ticketRequired;
-	
+
 	@Column(name = "ticket_parent")
 	private Long ticketParent;
-	
+
 	@Column(name = "ticket_order")
 	private int ticketOrder;
-	
+
 	@Column(name = "ticket_meta")
 	private String ticketMeta;
 
@@ -85,8 +88,6 @@ public class WpEmTickets {
 		this.ticketSpaces = ticketSpaces;
 		this.ticketOrder = ticketOrder;
 	}
-
-
 
 	public Long getTicketId() {
 		return ticketId;
@@ -224,5 +225,15 @@ public class WpEmTickets {
 		this.ticketMeta = ticketMeta;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "WpEmTickets [ticketId=" + ticketId + ", eventId=" + eventId + ", ticketName=" + ticketName
+				+ ", ticketDescription=" + ticketDescription + ", ticketPrice=" + ticketPrice + ", ticketStart="
+				+ ticketStart + ", ticketEnd=" + ticketEnd + ", ticketMin=" + ticketMin + ", ticketMax=" + ticketMax
+				+ ", ticketSpaces=" + ticketSpaces + ", ticketMembers=" + ticketMembers + ", ticketMembersRoles="
+				+ ticketMembersRoles + ", ticketGuests=" + ticketGuests + ", ticketRequired=" + ticketRequired
+				+ ", ticketParent=" + ticketParent + ", ticketOrder=" + ticketOrder + ", ticketMeta=" + ticketMeta
+				+ "]";
+	}
+
 }

@@ -9,11 +9,17 @@ import java.util.Calendar;
 import java.util.Calendar.Builder;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import com.fairportkungfu.util.classmanager.dao.WpDbDao;
+import com.fairportkungfu.util.classmanager.dao.WpEmEventsDao;
+import com.fairportkungfu.util.classmanager.dao.WpEmTicketsDao;
+import com.fairportkungfu.util.classmanager.dao.WpPostMetaDao;
+import com.fairportkungfu.util.classmanager.dao.WpPostsDao;
 import com.fairportkungfu.util.classmanager.model.FkfClass;
+import com.fairportkungfu.util.classmanager.model.WpClassComposite;
 import com.fairportkungfu.util.classmanager.model.WpEmEvents;
 import com.fairportkungfu.util.classmanager.model.WpEmTickets;
 import com.fairportkungfu.util.classmanager.model.WpPostMeta;
@@ -45,8 +51,7 @@ public class ClassManager {
 	private static final int DUR_KIDS = 35;
 	private static final int DUR_ADULTS_DEFAULT = 60;
 	private static final int DUR_ADULTS_SUNDAY = 60;
-	
-	
+
 	// Looks weird, but we don't want the classes to show up for registration until
 	// enabled. Just restore in the console.
 	private static final String POST_STATUS = "publish";
@@ -62,21 +67,20 @@ public class ClassManager {
 		Calendar dateCalNow = null;
 		int dayOfWeek;
 
-		log.info("Date is "+dfDateOnlyLog.format(date));
-		
+		log.info("Date is " + dfDateOnlyLog.format(date));
+
 		// Convert to Date cal b/c it's easier to deal with the parts of date and time
 		dateCalClasses = new Calendar.Builder().setInstant(date).build();
 		dateCalNow = new Calendar.Builder().setInstant(System.currentTimeMillis()).build();
-		
+
 		log.info("Preflight check: given date and time is later than now");
-		log.info(" - Given time: "+dfFullDateTimeLog.format(dateCalClasses.getTime()));
-		log.info(" - Now       : "+dfFullDateTimeLog.format(dateCalNow.getTime()));
+		log.info(" - Given time: " + dfFullDateTimeLog.format(dateCalClasses.getTime()));
+		log.info(" - Now       : " + dfFullDateTimeLog.format(dateCalNow.getTime()));
 
 		if (dateCalClasses.before(dateCalNow)) {
 			log.info("Failed preflight check for date. Aborting.");
 			throw new Exception("Date must be in future");
-		}
-		else
+		} else
 			log.info(" - PASS");
 
 		log.info("Creating classes for: " + dfDateOnlyLog.format(dateCalClasses.getTime()) + ": START");
@@ -87,10 +91,10 @@ public class ClassManager {
 		builder.set(Calendar.MONTH, dateCalClasses.get(Calendar.MONTH));
 		builder.set(Calendar.DAY_OF_MONTH, dateCalClasses.get(Calendar.DAY_OF_MONTH));
 		builder.set(Calendar.YEAR, dateCalClasses.get(Calendar.YEAR));
-		
+
 		switch (dayOfWeek) {
 		case Calendar.SUNDAY:
-			createClass(builder.setTimeOfDay(8,  30 ,  0).build(), DUR_ADULTS_SUNDAY, PROG_ADULTS);
+			createClass(builder.setTimeOfDay(8, 30, 0).build(), DUR_ADULTS_SUNDAY, PROG_ADULTS);
 			break;
 		case Calendar.TUESDAY:
 			createClass(builder.setTimeOfDay(17, 0, 0).build(), DUR_TIGERS, PROG_TIGERS);
@@ -118,11 +122,98 @@ public class ClassManager {
 		log.info("Creating classes for: " + dfDateOnlyLog.format(dateCalClasses.getTime()) + ": END");
 
 	}
+	
+	public List<WpClassComposite> queryClassByDate(Date date) {
+		
+		List<WpClassComposite> dbClassComposites = null;
+		List<WpEmEvents> events= null;		
+		WpEmEventsDao evtDao = null;
+		Set<Long> postIds = null;
+		
+		dbClassComposites = new ArrayList<WpClassComposite>();
+		evtDao = new WpEmEventsDao();
+		postIds = new TreeSet<Long>();
+		
+		// Get the events for the given day and build a list of post ids so we can query by post
+		events = evtDao.querybyEventDate(new java.sql.Date(date.getTime()));
+		for (WpEmEvents event: events) {
+			postIds.add(event.getPostId());
+		}
+		
+		// Query for each post
+		for (Long postId : postIds) {
+			dbClassComposites.add(queryClassByPostId(postId));
+		}
+		
+		return dbClassComposites;
+	}
+
+	public WpClassComposite queryClassByPostId(Long id) {
+		WpClassComposite dbClassComposite = null;
+		
+		dbClassComposite = new WpClassComposite();
+		dbClassComposite.setPost(queryWpPost(id));
+		
+		// Get the event and postmeta from post id
+		if (dbClassComposite.getPost() != null) {
+			dbClassComposite.setEvent(queryWpEmEvent(dbClassComposite.getPost().getId()));
+			dbClassComposite.setPostMeta(queryWpPostMeta(dbClassComposite.getPost().getId()));
+		}
+		
+		// Get ticket from event id
+		if (dbClassComposite.getEvent() != null) {
+			dbClassComposite.setTicket(queryWpEmTicket(dbClassComposite.getEvent().getEventId()));
+		}
+		
+		return dbClassComposite;
+	}
+	
+	private WpPosts queryWpPost(Long id) {
+		WpPosts post = null;
+		WpPostsDao dao = null;
+		
+		dao = new WpPostsDao();
+		
+		post = dao.findById(id);
+		
+		return post;
+	}
+	
+	private WpEmEvents queryWpEmEvent(Long postId) {
+		WpEmEvents event = null;
+		WpEmEventsDao dao = null;
+		
+		dao = new WpEmEventsDao();
+		event = dao.findByPostId(postId);
+		return event;
+	}
+	
+	private WpEmTickets queryWpEmTicket(Long eventId) {
+		WpEmTickets ticket = null;
+		WpEmTicketsDao dao = null;
+		
+		dao = new WpEmTicketsDao();
+		ticket = dao.findByPostId(eventId);
+		return ticket;
+	}
+	
+	private List<WpPostMeta> queryWpPostMeta(Long postId) {
+		List<WpPostMeta> postMeta = null;
+		WpPostMetaDao dao = null;
+		
+		dao = new WpPostMetaDao();
+		postMeta = dao.queryByPostId(postId);
+		return postMeta;
+	}
 
 	private Long createClass(Calendar classTime, int durationMins, String program) {
 		FkfClass cls = null;
 		WpPosts post = null;
-		WpDbDao dao = null;
+		WpPostsDao postsDao = null;
+		WpEmEventsDao eventsDao = null;
+		WpPostMetaDao postMetaDao = null;
+		WpEmTicketsDao ticketsDao = null;
+		
 		WpEmEvents evt = null;
 		List<WpPostMeta> postMeta = null;
 		WpEmTickets tick = null;
@@ -130,29 +221,44 @@ public class ClassManager {
 		Long postId = 0L;
 		Long eventId = 0L;
 
-		dao = new WpDbDao();
+		postsDao = new WpPostsDao();
+		eventsDao = new WpEmEventsDao();
+		postMetaDao = new WpPostMetaDao();
+		ticketsDao = new WpEmTicketsDao();
+		
+		
 		cls = renderClass(classTime, durationMins, program);
-	
-		log.info(" - Create class for: "+cls.toString());
+
+		log.info(" - Create class for: " + cls.toString());
 		post = map(cls);
-		post = dao.saveWpPost(post);
+		post = postsDao.saveWpPost(post);
 		post.setGuid(post.getGuid() + "p=" + post.getId());
-		dao.updateWpPost(post);
+		postsDao.updateWpPost(post);
 
 		evt = mapWpEvent(cls, post);
 		evt.setPostId(post.getId());
-		evt = dao.saveWpEmEvent(evt);
+		evt = eventsDao.save(evt);
 
 		postMeta = mapPostMeta(evt);
-		dao.saveWpPostMeta(postMeta);
+		postMetaDao.save(postMeta);
 
 		tick = mapWpEmTicket(evt);
-		dao.saveWpEmTicket(tick);
+		ticketsDao.save(tick);
 
 		return postId;
 
 	}
 	
+	private FkfClass map(WpClassComposite ec) {
+		FkfClass cls = null;
+		
+		cls = new FkfClass();
+		
+		//cls.setProgram(ec);
+		
+		return cls;
+	}
+
 	private WpPosts map(FkfClass cls) {
 		WpPosts post = null;
 		Timestamp currTime = null;

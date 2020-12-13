@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -17,6 +18,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "wp_postmeta")
+@NamedQuery(name = "WpPostMeta.queryByPostId", query = "select p from WpPostMeta p where p.postId = :postId")
 public class WpPostMeta {
 
 	@Id
@@ -77,4 +79,11 @@ public class WpPostMeta {
 		this.meta_value = meta_value;
 	}
 
+	@Override
+	public String toString() {
+		return "WpPostMeta [metaId=" + metaId + ", postId=" + postId + ", meta_key=" + meta_key + ", meta_value="
+				+ meta_value + "]";
+	}
+
+	
 }
