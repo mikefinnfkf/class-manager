@@ -39,11 +39,12 @@ public class ClassManager {
 	private static final String PROG_TIGERS = "Tigers";
 	private static final String PROG_KIDS = "Kids";
 	private static final String PROG_ADULTS = "Adults";
+	@SuppressWarnings("unused")
 	private static final String PROG_TEST = "TEST_DONOTUSE";
 	private static final int DUR_TIGERS = 20;
 	private static final int DUR_KIDS = 35;
 	private static final int DUR_ADULTS_DEFAULT = 60;
-	private static final int DUR_ADULTS_SUNDAY = 45;
+	private static final int DUR_ADULTS_SUNDAY = 60;
 	
 	
 	// Looks weird, but we don't want the classes to show up for registration until
@@ -89,7 +90,7 @@ public class ClassManager {
 		
 		switch (dayOfWeek) {
 		case Calendar.SUNDAY:
-			createClass(builder.setTimeOfDay(10,  0 ,  0).build(), DUR_ADULTS_SUNDAY, PROG_ADULTS);
+			createClass(builder.setTimeOfDay(8,  30 ,  0).build(), DUR_ADULTS_SUNDAY, PROG_ADULTS);
 			break;
 		case Calendar.TUESDAY:
 			createClass(builder.setTimeOfDay(17, 0, 0).build(), DUR_TIGERS, PROG_TIGERS);
