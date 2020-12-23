@@ -18,8 +18,8 @@ public class MainApp {
 	private static final String CMD_QUERY_DATE = "querydate";
 
 	static {
-		String path = MainApp.class.getClassLoader().getResource("app.logging.properties").getFile();
-		System.setProperty("java.util.logging.config.file", path);
+		//String path = MainApp.class.getClassLoader().getResource("app.logging.properties").getFile();
+		//System.setProperty("java.util.logging.config.file", path);
 		LOG = Logger.getLogger(MainApp.class.getName());
 		DATE_FORMATTER.setLenient(false);
 	}
@@ -58,7 +58,9 @@ public class MainApp {
 		String commandArg = null;
 
 		if (args.length < 2) {
-			LOG.severe("Malformed args. Usage: MainApp command argument");
+			LOG.severe("Malformed args. Usage: MainApp command date");
+			LOG.severe("  Valid commands: create, query");
+			LOG.severe("  Date must be in format "+DATE_FORMAT_PATTERN+".");
 			System.exit(1);
 		}
 

@@ -1,7 +1,11 @@
 package com.fairportkungfu.util.classmanager.dao;
 
+import java.sql.Date;
+import java.util.List;
+
 import javax.persistence.Query;
 
+import com.fairportkungfu.util.classmanager.model.WpEmEvents;
 import com.fairportkungfu.util.classmanager.model.WpPosts;
 
 public class WpPostsDao extends BaseDao {
@@ -18,7 +22,7 @@ public class WpPostsDao extends BaseDao {
 
 		return post;
 	}
-
+	
 	public WpPosts saveWpPost(WpPosts post) {
 		
 		init();
