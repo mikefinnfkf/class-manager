@@ -76,7 +76,7 @@ public class ClassManager {
 		dateCalNow = new Calendar.Builder().setInstant(System.currentTimeMillis()).build();
 
 		log.info("Preflight check: make sure there are no classes defined for given date");
-		isDateConflict = existsClassByDate(getCurrentTime());
+		isDateConflict = existsClassByDate(date);
 		log.info(" - Classes exist for given date: " + isDateConflict);
 		if (isDateConflict) {
 			log.severe("Failed preflight check for existing classes on date. Aborting.");
