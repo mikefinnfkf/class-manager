@@ -3,23 +3,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
 	version="2.2">
-	<persistence-unit name="main-test">
-		<class>com.fairportkungfu.util.eventcreator.WpPosts</class>
-		<properties>
-			<property name="hibernate.dialect"
-				value="org.hibernate.dialect.MySQL57Dialect" />
-			<property name="hibernate.hbm2ddl.auto" value="none" />
-			<property name="javax.persistence.jdbc.url"
-				value="jdbc:mysql://fairportkungfu.com:3306/fptkfadm_nodetest?useSSL=false&amp;serverTimezone=EST5EDT" />
-			<property name="javax.persistence.jdbc.user"
-				value="fptkfadm_prodapi" />
-			<property name="javax.persistence.jdbc.password"
-				value="KungFu%Db%99" />
-			<property name="javax.persistence.jdbc.driver"
-				value="com.mysql.jdbc.Driver" />
-		</properties>
-	</persistence-unit>
-	
+
+	<!-- Full version in OneDrive pers folder -->
+
 	<persistence-unit name="main-prod">
 		<class>com.fairportkungfu.util.eventcreator.WpPosts</class>
 		<properties>
@@ -27,13 +13,13 @@
 				value="org.hibernate.dialect.MySQL57Dialect" />
 			<property name="hibernate.hbm2ddl.auto" value="none" />
 			<property name="javax.persistence.jdbc.url"
-				value="jdbc:mysql://fairportkungfu.com:3306/fptkfadm_prod01?useSSL=false&amp;serverTimezone=EST5EDT" />
+				value="" />
 			<property name="javax.persistence.jdbc.user"
-				value="fptkfadm_prod01" />
+				value="" />
 			<property name="javax.persistence.jdbc.password"
-				value="KungFu%Db%01" />
+				value="" />
 			<property name="javax.persistence.jdbc.driver"
-				value="com.mysql.jdbc.Driver" />
+				value="com.mysql.cj.jdbc.Driver" />
 		</properties>
 	</persistence-unit>
 </persistence>
