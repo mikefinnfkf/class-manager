@@ -39,7 +39,9 @@ public class ClassManager {
 	private static DateFormat dfTimeOnlyMeta = new SimpleDateFormat("HH:mm:ss");
 	private static final String TIME_ZONE_ID = "EST5EDT";
 	private static final TimeZone TIME_ZONE = TimeZone.getTimeZone(TIME_ZONE_ID);
-	private static final Long RSVP_WINDOW = 60L * 60L * 1000L * 1L; // 1 hours
+	//private static final Long RSVP_WINDOW = 60L * 60L * 1000L * 1L; // 1 hours
+	// MJF 04/25/2021 - No RSVP window
+	private static final Long RSVP_WINDOW = 0L;
 	private static final Long EVENT_OWNER = 4L;
 	private static final Integer ALLOWED_SPACES = 8;
 	private static final String PROG_TIGERS = "Tigers";
